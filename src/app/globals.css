@@ -1,3 +1,5 @@
+@import "normalize.css";
+
 :root {
   --max-width: 1100px;
   --border-radius: 12px;
@@ -5,7 +7,10 @@
     "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
     "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
 
-  --foreground-rgb: 0, 0, 0;
+  --theme: #00ffff;
+  --background: #000000; 
+
+  /* --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
 
@@ -37,10 +42,10 @@
   --callout-rgb: 238, 240, 241;
   --callout-border-rgb: 172, 175, 176;
   --card-rgb: 180, 185, 188;
-  --card-border-rgb: 131, 134, 135;
+  --card-border-rgb: 131, 134, 135; */
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
@@ -71,7 +76,7 @@
     --card-rgb: 100, 100, 100;
     --card-border-rgb: 200, 200, 200;
   }
-}
+} */
 
 * {
   box-sizing: border-box;
@@ -79,29 +84,76 @@
   margin: 0;
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+html {
+  color: white;
+  font-size: 14px;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  max-width: 100vw;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+  'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+  'Noto Color Emoji';
+  font-weight: 200;
+  cursor: none;
+  overflow: hidden;
+
+  /* background-color: var(--background); */
+
+  height: 100vh;
+  width: 100vw;
+  background:black;
+  /* background-image:
+     linear-gradient(black 28px,transparent 0),
+     linear-gradient(90deg,rgb(58, 58, 58) 2px,transparent 0);
+  background-size:30px 30px,30px 30px; */
+  background-image: url("../../public/bg-dot.png");
+}
+
+h1 {
+  font-size: 5rem;
+  font-weight: 900;
+
 }
 
 a {
-  color: inherit;
+  color: white;
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
+.bg {
+  position: fixed;
+}
+
+/* 背景光效 */
+.shark-wrap {
+  height: 100vh;
+  width: 100vw;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.shark-wrap::before{
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background: linear-gradient(45deg, rgba(255,255,255,0) 40%, rgba(255, 255, 255, 0.5), rgba(255,255,255,0) 60%);
+  animation: shark-wrap 8s infinite;
+  transform: translateX(-100%);
+  mix-blend-mode: color-dodge;
+  pointer-events: none;
+}
+@keyframes shark-wrap {
+  to {
+    transform: translateX(100%);
+  }
+}
+.shark-wrap::-webkit-scrollbar {
+  display: none;
+}
+
+/* @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
   }
-}
+} */
