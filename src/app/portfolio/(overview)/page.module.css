@@ -1,0 +1,19 @@
+.particle{
+  width: 200px;
+  height:200px;
+  background:black;
+  background-image:
+     linear-gradient(#58a 14px,transparent 0),
+     linear-gradient(90deg,white 1px,transparent 0);
+  background-size:15px 15px,15px 15px;
+}
+
+
+
+a.active {
+  color: cyan;
+}
+
+.contact {
+  display: none;
+}

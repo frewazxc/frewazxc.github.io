@@ -1,8 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
-import style from "./page.module.css";
 
 interface StyledWorksblockProps {
     $top: string;
@@ -55,7 +53,8 @@ const AnimatedGeo_3 = styled.svg`
     mix-blend-mode: difference;
     `;
 
-const StyledWorksblock = styled.div<StyledWorksblockProps>`
+const StyledWorksblock = styled.button<StyledWorksblockProps>`
+    background:transparent;
     position: fixed;
     top: ${({ $top }) => $top};
     left: ${({ $left }) => $left};
