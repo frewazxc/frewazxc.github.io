@@ -6,11 +6,12 @@ interface ItemProps {
   children: React.ReactNode;
   index: number;
   onMove: (prevIndex: number, nextIndex: number) => void;
+  onMouseUp: () => void;
   listLength: number;
   color: string;
 }
 
-const Item: React.FC<ItemProps> = ({ children, index, onMove, listLength, color }) => {
+const Item: React.FC<ItemProps> = ({ children, index, onMove, onMouseUp, listLength, color }) => {
   const [left, setLeft] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [zIndex, setZIndex] = useState(0);
@@ -63,6 +64,7 @@ const Item: React.FC<ItemProps> = ({ children, index, onMove, listLength, color 
       delayedSetZIndexTimeoutId = setTimeout(() => {
         setZIndex(0);
       }, 200);
+      onMouseUp();
     };
 
     const mouseDown = (ev: MouseEvent) => {
@@ -119,15 +121,13 @@ const Item: React.FC<ItemProps> = ({ children, index, onMove, listLength, color 
   return (
     <div
       ref={ref}
-      className="w-16 h-16"
+      className="w-16 h-16 relative border-none"
       style={{
         background: color,
-        border: "none",
         padding: "10px",
         transform: isDragging ? `scale(1.01)` : `scale(1)`,
         left: `${left}px`,
         transition: "transform .2s, box-shadow .2s",
-        position: "relative",
         boxShadow: isDragging
           ? "0 0 10px 2px rgba(0, 0, 0, 0.5)"
           : "0 0 0 0px rgba(0, 0, 0, 0.5)",
@@ -142,7 +142,7 @@ const Item: React.FC<ItemProps> = ({ children, index, onMove, listLength, color 
 interface SortableProps {
   list: { key: number; content: string }[];
   setList: React.Dispatch<React.SetStateAction<{ key: number; content: string }[]>>;
-
+  onMouseUp: () => void;
 }
 
 interface CheckWinProps {
@@ -150,17 +150,7 @@ interface CheckWinProps {
   [prop: string]: any;
 }
 
-const Sortable: React.FC<SortableProps> = ({ list, setList }) => {
-  function checkWin<T>(list: CheckWinProps[]): void {
-    for(let i=0; i<list.length; i++) {
-      if (list[i].key !== i) {break};
-      alert('win')
-    }
-  };
-
-  // useEffect(()=>{
-  //   checkWin(list)
-  // },list)
+const Sortable: React.FC<SortableProps> = ({ list, setList, onMouseUp }) => {
 
   return (
     <>
@@ -174,6 +164,7 @@ const Sortable: React.FC<SortableProps> = ({ list, setList }) => {
             newList.splice(nextIndex, 0, newList.splice(prevIndex, 1)[0]);
             setList(newList);
           }}
+          onMouseUp={onMouseUp}
           color={child.content}
         >
         </Item>

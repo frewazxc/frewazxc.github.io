@@ -1,15 +1,21 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Sortable from '@/app/games/gradientcolors/sortable';
+import { warn } from 'console';
 
-interface colorProps {
+interface ColorProps {
   r: number,
   g: number,
   b: number,
 }
 
+interface ItemProps {
+  key: number;
+  content: string;
+}
+
 // 生成渐变色卡
-function generateGradient(startColor: colorProps, endColor: colorProps, steps: number) {
+function generateGradient(startColor: ColorProps, endColor: ColorProps, steps: number) {
   const stepR = (endColor.r - startColor.r) / (steps - 1);
   const stepG = (endColor.g - startColor.g) / (steps - 1);
   const stepB = (endColor.b - startColor.b) / (steps - 1);
@@ -27,6 +33,9 @@ function generateGradient(startColor: colorProps, endColor: colorProps, steps: n
 }
 
 const App: React.FC = () => {
+  const [colorList, setColorList] = useState<ItemProps[]>([]);
+  const [shouldCheckWin, setShouldCheckWin] = useState(false);
+
   const startColor = {
     r : Math.floor(Math.random() * 256),
     g : Math.floor(Math.random() * 256),
@@ -40,6 +49,7 @@ const App: React.FC = () => {
   const steps = 10;
   const gradientColors =  generateGradient(startColor, endColor, steps);
 
+
   function shuffle<T>(array: T[]): T[] {
     let len = array.length;
     while (len > 1) {
@@ -52,17 +62,33 @@ const App: React.FC = () => {
     return array;
   }
 
-  const [list, setList] = React.useState(() =>{
-    const sortedColors = new Array(steps).fill(0).map((_, i) => ({
-      key: i,
-      content: `rgb(${gradientColors[i].r}, ${gradientColors[i].g}, ${gradientColors[i].b})`
-    }));
-    return sortedColors}
-  );
+  const sortedColors = new Array(steps).fill(0).map((_, i) => ({
+    key: i,
+    content: `rgb(${gradientColors[i].r}, ${gradientColors[i].g}, ${gradientColors[i].b})`
+  }));
+
+  function checkWin() {
+    const isWin = colorList.every((value, index) => value.key === index) || colorList.every((value, index) => value.key === steps - index - 1);
+    if( isWin ) {
+      alert('win');
+    }
+  }
+
+  useEffect(() => {
+    if (shouldCheckWin) {
+      checkWin();
+      setShouldCheckWin(false);
+    }
+  }, [shouldCheckWin]);
+
+  useEffect(() => {
+    const randomColors = shuffle(sortedColors);
+    setColorList(randomColors);
+  }, []);
 
   return (
     <div className="h-full flex items-center justify-center">
-      <Sortable list={list} setList={setList}></Sortable>
+      <Sortable list={colorList} setList={(newList) => {setColorList(newList)}} onMouseUp={() => setShouldCheckWin(true)}></Sortable>
     </div>
   );
 };
