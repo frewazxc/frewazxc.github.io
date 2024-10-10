@@ -37,7 +37,7 @@ body {
   width: 100vw;
   background:black;
 
-  background-image: url("../../public/bg-dot.png");
+  background-image: url("/bg-dot.png");
 }
 
 /* 背景光效 */
