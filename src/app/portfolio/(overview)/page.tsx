@@ -4,16 +4,14 @@ import React, { Children, useState } from 'react';
 import WorksSection from './works-section';
 import HomeSection from './home-section';
 import AboutSection from './about-section';
-import style from "./page.module.css";
-import { transform } from 'next/dist/build/swc';
-import GlobalNav from '@/app/ui/global-nav';
+import GlobalNav from '@/components/custom/global-nav';
 
 export default function Page() {
   const [currentPage, setCurrentPage] = useState(0);
 
   return (
     <div>
-      <GlobalNav onClick={(pageId:number)=>setCurrentPage(pageId)} currentPage={currentPage}/>
+      {/* <GlobalNav onClick={(pageId:number)=>setCurrentPage(pageId)} currentPage={currentPage}/> */}
       <div className='h-screen w-300 flex transition-transform duration-m'
             style={{transform: 'translateX(-' + currentPage * 100 + 'vw)'}}
             id='container' 
@@ -22,7 +20,8 @@ export default function Page() {
                 setCurrentPage((prevPage) => Math.min(prevPage + 1, 2))
               } else {
                 setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))
-              }; })}>
+              }; 
+              })}>
         <HorizontalPage title="home">
           <HomeSection/>
         </HorizontalPage>
@@ -37,13 +36,6 @@ export default function Page() {
   );
 }
 
-function NavItem( {title, onItemClick, status}:{title:string, onItemClick:Function, status:string} ) {
-  return (
-    <a href={`/#${title}`} onClick={e => { e.preventDefault(); onItemClick() }} className={'nav-item' + (status==='selected'? ' active' : '')}>
-      {title[0].toUpperCase()+title.substring(1)}
-    </a>
-  )
-}
 
 function HorizontalPage({children, title}:{children:React.ReactNode, title:string}) {
   return (

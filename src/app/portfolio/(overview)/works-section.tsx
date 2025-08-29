@@ -1,6 +1,6 @@
 "use client"
 
-import WorksBlock from "@/app/ui/portfolio/worksblock"
+import WorksBlock from "@/components/custom/portfolio/worksblock"
 
 export default function WorksSection() {
   const icosahedron = "M93.0048,180L0,129.925L0,50.0755L93.0048,0L161,37.608L161,142.392L93.0048,180Z";

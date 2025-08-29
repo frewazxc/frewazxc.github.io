@@ -1,129 +1,205 @@
-'use client'
+"use client";
+import React, { useEffect } from 'react';
+import { Engine, Render, Runner, Composites, Common, MouseConstraint, Mouse, Composite, Bodies } from 'matter-js';
 
-import React, { useEffect, useRef } from 'react';
-import Matter, { Engine, Render, Runner, Bodies, Composite, Composites, Vertices, Mouse, MouseConstraint, Common } from 'matter-js';
-import decomp from 'poly-decomp';
-
-
-
-Common.setDecomp(decomp); // Ensure poly-decomp is set
-
-const ConcaveExample: React.FC = () => {
-  const sceneRef = useRef<HTMLDivElement | null>(null); // Reference to the div where canvas will be rendered
-  const engineRef = useRef<Engine | null>(null);
-  const runnerRef = useRef<Runner | null>(null);
-
+const AdvancedShapesWithSprites = () => {
   useEffect(() => {
-    // Create the Matter.js engine and world
+    // 创建物理引擎
     const engine = Engine.create();
     const world = engine.world;
-    engineRef.current = engine;
 
-    // Create renderer
+    // 获取容器元素
+    const renderElement = document.getElementById('matter-container');
+    if (!renderElement) return;
+
+    // 配置渲染器
     const render = Render.create({
-      element: sceneRef.current as HTMLElement,
+      element: renderElement,
       engine: engine,
       options: {
         width: 800,
         height: 600,
-        wireframes: false // Disable wireframes for colored shapes
+        wireframes: false,
+        background: '#1a1a1a'
       }
     });
 
+    interface ShapeConfig {
+      texture: string;
+      size?: number;
+      sizes?: [number, number]; 
+      xScale: number;
+      yScale: number;
+    }
+
+    const SHAPES: Record<string, ShapeConfig> = {
+      CIRCLE: { 
+        texture: '/circle.png',
+        size: 50,
+        xScale: 1,  
+        yScale: 1 
+      },
+      TRIANGLE: { 
+        texture: '/triangle.png', 
+        size: 45,
+        xScale: 1,
+        yScale: 1
+      },
+      PENTAGON: { 
+        texture: '/pentagon.png', 
+        size: 40,
+        xScale: 1,
+        yScale: 1
+      },
+      HEXAGON: { 
+        texture: '/hexagon.png', 
+        size: 45,
+        xScale: 1,
+        yScale: 1
+      },
+      CUSTOM_POLYGON: { 
+        texture: '/polygon.png', 
+        size: 40,
+        xScale: 1,
+        yScale: 1
+      },
+      RECTANGLE: { 
+        texture: '/rectangle.png', 
+        sizes: [40, 60], // 明确定义为元组
+        xScale: 1,
+        yScale: 1
+      }
+    };
+
     Render.run(render);
 
-    // Create runner
     const runner = Runner.create();
-    runnerRef.current = runner;
     Runner.run(runner, engine);
 
-    // Add walls (static bodies)
-    Composite.add(world, [
-      Bodies.rectangle(400, 0, 800, 50, { isStatic: true }), // Top wall
-      Bodies.rectangle(400, 600, 800, 50, { isStatic: true }), // Bottom wall
-      Bodies.rectangle(800, 300, 50, 600, { isStatic: true }), // Right wall
-      Bodies.rectangle(0, 300, 50, 600, { isStatic: true }) // Left wall
-    ]);
+    // 生成形状堆叠
+    const stack = Composites.stack(20, 20, 10, 5, 0, 0, (x: number, y: number) => {
+      const shapeType = Common.random(0, 1);
 
-    // Create shapes using vertices (concave shapes)
-    const tempBody = Bodies.rectangle(0, 0, 1, 1);
-    const arrow = Vertices.create([
-      { x: 40, y: 0 },
-      { x: 40, y: 20 },
-      { x: 100, y: 20 },
-      { x: 100, y: 80 },
-      { x: 40, y: 80 },
-      { x: 40, y: 100 },
-      { x: 0, y: 50 }
-    ], tempBody);
-    const chevron = Vertices.create([
-      { x: 100, y: 0 },
-      { x: 75, y: 50 },
-      { x: 100, y: 100 },
-      { x: 25, y: 100 },
-      { x: 0, y: 50 },
-      { x: 25, y: 0 },
-    ], tempBody);
-    const star = Vertices.create([
-      { x: 50, y: 0 },
-      { x: 63, y: 38 },
-      { x: 100, y: 38 },
-      { x: 69, y: 59 },
-      { x: 82, y: 100 },
-      { x: 50, y: 75 },
-      { x: 18, y: 100 },
-      { x: 30, y: 59 },
-      { x: 0, y: 38 },
-      { x: 37, y: 38 },
-    ], tempBody);
+      switch(true) {
+        case shapeType < 0.15:
+          return Bodies.circle(x, y, SHAPES.CIRCLE.size!, {
+            render: { 
+              sprite: { 
+                texture: SHAPES.CIRCLE.texture,
+                xScale: SHAPES.CIRCLE.xScale,
+                yScale: SHAPES.CIRCLE.yScale
+              }
+            }
+          });
 
-    // Create a stack of concave bodies
-    const stack = Composites.stack(50, 50, 6, 4, 10, 10, (x:number, y:number) => {
-      const color = Common.choose(['#f19648', '#f5d259', '#f55a3c', '#063e7b', '#ececd1']);
-      return Bodies.fromVertices(x, y, new Array(Common.choose([arrow, chevron, star])), {
-        render: {
-          fillStyle: color,
-          strokeStyle: color,
-          lineWidth: 1
+        case shapeType < 0.35:
+          return Bodies.polygon(x, y, 3, SHAPES.TRIANGLE.size!, {
+            render: { 
+              sprite: { 
+                texture: SHAPES.TRIANGLE.texture,
+                xScale: SHAPES.TRIANGLE.xScale,
+                yScale: SHAPES.TRIANGLE.yScale
+              }
+            }
+          });
+
+        case shapeType < 0.5:
+          return Bodies.polygon(x, y, 5, SHAPES.PENTAGON.size!, {
+            render: { 
+              sprite: { 
+                texture: SHAPES.PENTAGON.texture,
+                xScale: SHAPES.PENTAGON.xScale,
+                yScale: SHAPES.PENTAGON.yScale
+              }
+            }
+          });
+
+        case shapeType < 0.65:
+          return Bodies.polygon(x, y, 6, SHAPES.HEXAGON.size!, {
+            render: { 
+              sprite: { 
+                texture: SHAPES.HEXAGON.texture,
+                xScale: SHAPES.HEXAGON.xScale,
+                yScale: SHAPES.HEXAGON.yScale
+              }
+            }
+          });
+
+        case shapeType < 0.75: {
+          const sides = Common.random(7, 10);
+          return Bodies.polygon(x, y, sides, SHAPES.CUSTOM_POLYGON.size!, {
+            render: { 
+              sprite: { 
+                texture: SHAPES.CUSTOM_POLYGON.texture,
+                xScale: SHAPES.CUSTOM_POLYGON.xScale,
+                yScale: SHAPES.CUSTOM_POLYGON.yScale
+              }
+            }
+          });
         }
-      }, true);
+
+        default: {
+          const [minSize, maxSize] = SHAPES.RECTANGLE.sizes!;
+          return Bodies.rectangle(
+            x,
+            y,
+            Common.random(minSize, maxSize),
+            Common.random(minSize, maxSize),
+            { 
+              render: { 
+                sprite: { 
+                  texture: SHAPES.RECTANGLE.texture,
+                  xScale: SHAPES.RECTANGLE.xScale,
+                  yScale: SHAPES.RECTANGLE.yScale
+                }
+              } 
+            }
+          );
+        }
+      }
     });
 
     Composite.add(world, stack);
 
-    // Add mouse control
+    // 添加边界墙
+    Composite.add(world, [
+      Bodies.rectangle(400, -10, 820, 20, { isStatic: true }),
+      Bodies.rectangle(400, 610, 820, 20, { isStatic: true }),
+      Bodies.rectangle(810, 300, 20, 620, { isStatic: true }),
+      Bodies.rectangle(-10, 300, 20, 620, { isStatic: true })
+    ]);
+
+    // 设置鼠标交互
     const mouse = Mouse.create(render.canvas);
     const mouseConstraint = MouseConstraint.create(engine, {
       mouse: mouse,
-      constraint: {
-        stiffness: 0.2,
-        render: {
-          visible: false
-        }
-      }
+      constraint: { stiffness: 0.2 }
     });
     Composite.add(world, mouseConstraint);
-
-    // Keep the mouse in sync with rendering
     render.mouse = mouse;
 
-    // Fit the render viewport to the scene
-    Render.lookAt(render, {
-      min: { x: 0, y: 0 },
-      max: { x: 800, y: 600 }
-    });
+    Render.lookAt(render, { min: { x: 0, y: 0 }, max: { x: 800, y: 600 } });
 
-    // Cleanup function to stop the engine and renderer when the component unmounts
     return () => {
       Render.stop(render);
       Runner.stop(runner);
-      Engine.clear(engine);
-      render.canvas.remove();
-      render.textures = {};
+      render.canvas?.remove();
     };
   }, []);
 
-  return <div className='h-full flex justify-center items-center' ref={sceneRef} />;
+  return (
+    <div className="flex">
+      <div
+        id="matter-container" 
+        style={{ 
+          width: '800px', 
+          height: '600px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+        }}
+      />
+    </div>
+  );
 };
 
-export default ConcaveExample;
+export default AdvancedShapesWithSprites;

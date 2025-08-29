@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { inter } from '@/app/ui/fonts';
+import { inter } from '@/components/custom/fonts';
 import "./normalize.css";
 import "./globals.css";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "frewazxc",

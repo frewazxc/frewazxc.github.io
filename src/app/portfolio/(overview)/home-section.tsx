@@ -1,7 +1,8 @@
+import ParallaxScrollGallery from "@/components/custom/portfolio/parallaxScrollGallery";
+
 export default function HomeSection() {
   return (
     <>
-      <h1>Hello World!</h1>
     </>
   )
 }

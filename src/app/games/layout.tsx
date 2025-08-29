@@ -1,5 +1,5 @@
 import React from "react"
-import CursorFollower from "../ui/cursorfollower"
+import CursorFollower from "../../components/custom/cursorfollower"
 
 export default function Layout({ children }:{ children:React.ReactNode }) {
   return(
