@@ -3,10 +3,14 @@ import React, { useEffect } from 'react';
 import { Engine, Render, Runner, Composites, Common, MouseConstraint, Mouse, Composite, Bodies } from 'matter-js';
 
 const AdvancedShapesWithSprites = () => {
+  const containerWidth = 800;
+  const containerHeight = 600;
+
   useEffect(() => {
     // 创建物理引擎
     const engine = Engine.create();
     const world = engine.world;
+
 
     // 获取容器元素
     const renderElement = document.getElementById('matter-container');
@@ -17,8 +21,8 @@ const AdvancedShapesWithSprites = () => {
       element: renderElement,
       engine: engine,
       options: {
-        width: 800,
-        height: 600,
+        width: containerWidth,
+        height: containerHeight,
         wireframes: false,
         background: '#1a1a1a'
       }
@@ -163,10 +167,10 @@ const AdvancedShapesWithSprites = () => {
 
     // 添加边界墙
     Composite.add(world, [
-      Bodies.rectangle(400, -10, 820, 20, { isStatic: true }),
-      Bodies.rectangle(400, 610, 820, 20, { isStatic: true }),
-      Bodies.rectangle(810, 300, 20, 620, { isStatic: true }),
-      Bodies.rectangle(-10, 300, 20, 620, { isStatic: true })
+      Bodies.rectangle(containerWidth / 2, -10, containerWidth + 20, 20, { isStatic: true }),
+      Bodies.rectangle(containerWidth / 2, containerHeight + 10, containerWidth + 20, 20, { isStatic: true }),
+      Bodies.rectangle(containerWidth + 10, containerHeight / 2, 20, containerHeight + 20, { isStatic: true }),
+      Bodies.rectangle(-10, containerHeight / 2, 20, containerHeight + 20, { isStatic: true })
     ]);
 
     // 设置鼠标交互
@@ -178,7 +182,7 @@ const AdvancedShapesWithSprites = () => {
     Composite.add(world, mouseConstraint);
     render.mouse = mouse;
 
-    Render.lookAt(render, { min: { x: 0, y: 0 }, max: { x: 800, y: 600 } });
+    Render.lookAt(render, { min: { x: 0, y: 0 }, max: { x: containerWidth, y: containerHeight } });
 
     return () => {
       Render.stop(render);
@@ -188,13 +192,12 @@ const AdvancedShapesWithSprites = () => {
   }, []);
 
   return (
-    <div className="flex">
+    <div className="flex h-full justify-center items-center">
       <div
         id="matter-container" 
         style={{ 
-          width: '800px', 
-          height: '600px',
-          borderRadius: '8px',
+          width: containerWidth, 
+          height: containerHeight,
           boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
         }}
       />

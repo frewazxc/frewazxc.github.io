@@ -6,13 +6,11 @@ import MultipleSelector, { Option } from '@/components/ui/multiple-selector';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import React, { useState } from 'react';
 import { useGoodsStore } from '../../store/goods-store';
-import ThreeScene from '@/components/postcard/ThreeScene';
+import ThreeScene from '@/components/postcard/threeScene';
+import { group } from 'console';
 
 export default function PostcardPreview() {
-  const width = useGoodsStore((state) => state.width);
-  const height = useGoodsStore((state) => state.height);
-  const thickness = useGoodsStore((state) => state.thickness);
-  const formats = useGoodsStore((state) => state.formats) || [];
+  const { width, height, thickness, formats } = useGoodsStore();
   const [uploadedTextures, setUploadedTextures] = useState<{ [key: string]: string }>({});
   const lightX = useGoodsStore((state) => state.lightX);
   const lightY = useGoodsStore((state) => state.lightY);
@@ -27,15 +25,31 @@ export default function PostcardPreview() {
   const selectedFinishings = useGoodsStore((state) => state.selectedFinishings);
   const setSelectedFinishings = useGoodsStore((state) => state.setSelectedFinishings);
 
-const handleImageUpload = (file: File, key: string) => {
-  const newSelectedFinishings = selectedFinishings.map((finish) => {
-    if (finish.value === key) {
-      return { ...finish, image: URL.createObjectURL(file) };
-    }
-    return finish;
-  });
-  setSelectedFinishings(newSelectedFinishings);
-};
+  const finishingOptions = finishingList.map<Option>((finish) => ({
+    label: finish.label as string,
+    value: finish.key as string,
+    group: finish.group,
+    fixed: finish.key === 'printA',
+    disable: finish.key === 'printA',
+  }));
+  const intialFinishingOptions = selectedFinishings.map<Option>((finish) => ({
+    label: finish.label as string,
+    value: finish.key as string,
+    group: finish.group,
+    fixed: finish.key === 'printA',
+    disable: finish.key === 'printA',
+  }));
+  const [selectedFinishingOptions, setSelectedFinishingOptions] = useState<Option[]>(intialFinishingOptions);
+
+  const handleImageUpload = (file: File, key: string) => {
+    const newSelectedFinishings = selectedFinishings.map((finish) => {
+      if (finish.key === key) {
+        return { ...finish, image: URL.createObjectURL(file) };
+      }
+      return finish;
+    });
+    setSelectedFinishings(newSelectedFinishings);
+  };
 
   const handleFormatChange = (value: string) => {
     setFormat(value);
@@ -47,12 +61,20 @@ const handleImageUpload = (file: File, key: string) => {
   }
 
   const handleFinishingsChange = (selected: Option[]) => {
-    setSelectedFinishings(selected);
+    setSelectedFinishingOptions(selected);
+    const newSelectedFinishings = selected.map((finish) => {
+      return {
+        label: finish.label as string,
+        key: finish.value as string,
+        group: finish.group,
+      };
+    });
+    setSelectedFinishings(newSelectedFinishings);
   }
 
   return (
     <div className="flex h-full bg-white">
-      <ThreeScene/>
+      <ThreeScene />
       <div className="w-100 px-6 py-4 overflow-y-scroll">
         <Card className="mb-4">
           <CardHeader>
@@ -94,8 +116,8 @@ const handleImageUpload = (file: File, key: string) => {
             <div className="mb-4 max-w-72">
               <Label className="block capitalize">工艺</Label>
               <MultipleSelector
-                value={selectedFinishings}
-                defaultOptions={finishingList}
+                value={selectedFinishingOptions}
+                defaultOptions={finishingOptions}
                 hidePlaceholderWhenSelected
                 onChange={(selected) => { handleFinishingsChange(selected) }}
                 groupBy="group"
@@ -113,16 +135,15 @@ const handleImageUpload = (file: File, key: string) => {
             <CardTitle>图片上传</CardTitle>
           </CardHeader>
           <CardContent>
-            {selectedFinishings.map((key) => (
-              key.image && <div key={key.label} className="mb-2">
-                <Label className="block">{key.label}</Label>
+            {selectedFinishings.map((finishing, index) => (
+              finishing.image && <div key={index} className="mb-2">
+                <Label className="block">{finishing.label}</Label>
                 <Input
                   type="file"
                   accept="image/*"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
-                    if (file) handleImageUpload(file, key.value);
-                    // if (file) handleImageUpload(`front-${key}`, file);
+                    if (file) handleImageUpload(file, finishing.key as string);
                   }}
                 />
               </div>

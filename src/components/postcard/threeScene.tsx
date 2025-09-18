@@ -6,14 +6,12 @@ import { useGoodsStore } from '@/store/goods-store';
 import * as THREE from 'three';
 import { Option } from '../ui/multiple-selector';
 
+const  { width,  height, thickness, selectedFinishings } = useGoodsStore();
+const sideMat = new THREE.MeshLambertMaterial({ color: useGoodsStore((state: any) => state.sideColor) });
+const transparentMat = new THREE.MeshLambertMaterial({ transparent: true, opacity: 0 });
+const whiteMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+
 const ThreeScene = () => {
-  const width = useGoodsStore((state: any) => state.width);
-  const height = useGoodsStore((state: any) => state.height);
-  const thickness = useGoodsStore((state: any) => state.thickness);
-  const transparentMat = new THREE.MeshLambertMaterial({ transparent: true, opacity: 0 });
-  const whiteMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
-  const sideMat = new THREE.MeshLambertMaterial({ color: useGoodsStore((state: any) => state.sideColor) });
-  const selectedFinishings = useGoodsStore((state: any) => state.selectedFinishings);
   const { lightX, lightY, lightZ, lightIntensity } = useGoodsStore((state: any) => ({
     lightX: state.lightX,
     lightY: state.lightY,
@@ -34,13 +32,6 @@ const ThreeScene = () => {
         <mesh material={[sideMat, sideMat, sideMat, sideMat, whiteMat, whiteMat]}>
           <boxGeometry args={[width, height, thickness]} />
         </mesh>
-        {
-          selectedFinishings?.map((finishing: Option, i: number) => (
-            finishing.image
-              ? <PrintLayer key={i} image={finishing.image as string} frontSide={finishing.group === '正面'} />
-              : {}
-          ))
-        }
         <ambientLight intensity={0.4} />
         <directionalLight color="white" position={[lightX, lightY, lightZ]} intensity={lightIntensity} />
         <OrbitControls enableDamping />
@@ -83,6 +74,7 @@ const ThreeScene = () => {
     }
   }
   const PrintLayer = ({ image, frontSide }: { image: string, frontSide: boolean }) => {
+    const { width, height, thickness } = useGoodsStore();
     const texture = useTexture(image);
     const imageMat = new THREE.MeshLambertMaterial({ map: texture, transparent: true });
     const positionZ = frontSide ? thickness / 2 + 0.1 : -thickness / 2 - 0.1;
